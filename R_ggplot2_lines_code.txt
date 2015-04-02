@@ -1,4 +1,4 @@
-brary(ggplot2)
+library(ggplot2)
 
 #set the directory
 getwd()
@@ -20,24 +20,50 @@ df <- cbind(X, TAAR14d_D3.32A,TAAR14d_D5.42A)
 df <- data.frame(df)
 
 pdf( "SEAP_ggplot.pdf", width=4.5, height=4, useDingbats=FALSE )
-ggplot(df, aes(x=X)) +
+ggplot(data=df, aes(x=X)) +
+  #assign the shape, size, and fill to default code
   scale_shape_identity() +
-  scale_linetype_identity() +
   scale_size_identity() +
   scale_fill_identity() +
-  geom_line(aes(y = TAAR14d_D3.32A, colour = "B", linetype='solid',size=.5)) +
-  geom_line(aes(y = TAAR14d_D5.42A, colour = "R",linetype='dashed',size=.5)) +
-  geom_errorbar(aes(ymin= TAAR14d_D3.32A - TAAR14d_D3.32A_SEM, ymax=TAAR14d_D3.32A + TAAR14d_D3.32A_SEM), width=0.2, colour="B") +
-  geom_errorbar(aes(ymin= TAAR14d_D5.42A - TAAR14d_D5.42A_SEM, ymax=TAAR14d_D5.42A + TAAR14d_D5.42A_SEM), width=0.2, colour="R") +
-  geom_point(aes(y = TAAR14d_D3.32A, colour = "B", size=3,shape=21,fill='blue')) +
-  geom_point(aes(y = TAAR14d_D5.42A, colour = "R", size=3,shape=22,fill='red')) +
-  scale_colour_manual("", breaks = c("B", "R"), values = c("B"="blue", "R"="red"), labels = c("TAAR14d D3.32A", "TAAR14d D5.42A")) +
-  xlab("concentration (uM)") + ylab("SEAP activity") + ggtitle("TAAR14d and mutatants") +
-  xlim(1,10) + ylim(0,25) +
+  #set up the y axis
+  geom_line(aes(y = TAAR14d_D3.32A, colour = "color_B", linetype='line_S',size=.5)) +
+  geom_line(aes(y = TAAR14d_D5.42A, colour = "color_R",linetype='line_D',size=.5)) +
+  #set up the point of the data
+  geom_point(aes(y = TAAR14d_D3.32A, colour = "color_B", size=3,shape=21,fill='blue')) +
+  geom_point(aes(y = TAAR14d_D5.42A, colour = "color_R", size=3,shape=22,fill='red')) +
+  #set up the errorbar
+  geom_errorbar(aes(ymin= TAAR14d_D3.32A - TAAR14d_D3.32A_SEM, 
+                    ymax=TAAR14d_D3.32A + TAAR14d_D3.32A_SEM, colour= "color_B"), 
+                width=0.2) +
+  geom_errorbar(aes(ymin= TAAR14d_D5.42A - TAAR14d_D5.42A_SEM, 
+                    ymax=TAAR14d_D5.42A + TAAR14d_D5.42A_SEM, colour= "color_R"),
+                width=0.2) +
+  #assign the color
+  scale_colour_manual("", breaks = c("color_B", "color_R"), 
+                      values = c("color_B"="blue", "color_R"="red"), 
+                      labels = c("TAAR14d D3.32A", "TAAR14d D5.42A")) +
+  scale_linetype_manual("", breaks = c("line_S", "line_D"), 
+                        values = c("line_S"="solid", "line_D"="dashed"), 
+                        labels = c("TAAR14d D3.32A", "TAAR14d D5.42A")) +
+  #labels x and y axis, use expression to get Greek symbols
+  xlab(expression(paste("Concentration (", mu,"M)"))) + ylab("SEAP activity") + 
+  #label the title
+  ggtitle("TAAR14d and mutatants") +
+  #set the range of x and y axis
+  ylim(0,25) +
   #change x axis labels
-  scale_x_continuous(breaks=c(1:10),labels=c("0", "0.1", "0.3",'1','3','10','30','100','300','1000')) +
+  scale_x_continuous(breaks=c(1:10),
+                     labels=c("0", "0.1", "0.3",'1','3','10','30','100','300','1000')) +
   #theme_bw() will get rid of the background
   theme_bw() + 
+  #remove box sorrounding the figure legend
+  theme(legend.key = element_rect(colour="white", fill='white')) +
+  #put the legend inside the figure, use relative coordinates between 0 and 1
+  theme(legend.position = c(.2, .9))+
+  #rotate the x axis to 45 degree,not just angle= but also hjust=1 to 
+  #ensure that end of the label is placed under the tick mark. 
+  #Also theme_bw() should be placed before theme specification of axis texts.
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   #remove grid lines and border lines in background
   theme(panel.border = element_blank(), panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) 
